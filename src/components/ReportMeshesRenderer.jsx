@@ -114,7 +114,7 @@ export default function ReportMeshesRenderer({ reportData }) {
         {visibilityModeButtonUi[visibilityMode].icon}
       </IconButton>
 
-      <Canvas>
+      <Canvas linear flat>
         <ReportMeshesScene sceneData={sceneData} />
       </Canvas>
 
