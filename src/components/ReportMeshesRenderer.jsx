@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import IconButton from "@mui/material/IconButton";
 import {
@@ -11,10 +11,43 @@ import {
 } from "@mui/icons-material";
 
 import ReportMeshesScene from "./ReportMeshesScene";
+import { segmentMeshesUrlPrefix } from "../api/apiEndpoints";
 
-export default function ReportMeshesRenderer() {
+export default function ReportMeshesRenderer({ reportData }) {
   const [playbackState, setPlaybackState] = useState("playing");
   const [visibilityMode, setVisibilityMode] = useState("all_visible");
+
+  const [sceneData, setSceneData] = useState(emptySceneData);
+
+  const constructSceneDataFromReportData = (reportData) => {
+    const reportMediaId = reportData?.report_media_id ?? null;
+    const meshesMetadata = reportData?.meshes_metadata ?? null;
+
+    if (!reportMediaId || !meshesMetadata) {
+      return;
+    }
+
+    const sceneMeshes = [];
+    for (const mesh of meshesMetadata.meshes) {
+      sceneMeshes.push({
+        name: mesh.name,
+        url: `${segmentMeshesUrlPrefix}/${reportMediaId}/${mesh.name}`,
+        isROI: mesh.isROI,
+        color: "#", // TODO (Dr. Amit + Abhilaksh): get good colors
+      });
+    }
+
+    // sceneMeshes.forEach((mesh) => {
+    //   console.log(mesh);
+    // });
+
+    setSceneData({
+      meshes: sceneMeshes,
+    });
+
+    // console.log(reportMediaId);
+    // console.log(reportMediaId)
+  };
 
   const handleChangePlaybackStateButtonClick = (e) => {
     setPlaybackState(nextPlaybackState[playbackState]);
@@ -27,6 +60,10 @@ export default function ReportMeshesRenderer() {
   const handleVisibilityModeButtonClick = () => {
     setVisibilityMode(nextVisibilityMode[visibilityMode]);
   };
+
+  useEffect(() => {
+    constructSceneDataFromReportData(reportData);
+  }, [reportData]);
 
   return (
     <div
@@ -78,13 +115,17 @@ export default function ReportMeshesRenderer() {
       </IconButton>
 
       <Canvas>
-        <ReportMeshesScene />
+        <ReportMeshesScene sceneData={sceneData} />
       </Canvas>
 
       <h1>ReportMeshesRenderer</h1>
     </div>
   );
 }
+
+const emptySceneData = {
+  meshes: [],
+};
 
 const changePlaybackStateButtonUi = {
   playing: {
@@ -98,7 +139,6 @@ const changePlaybackStateButtonUi = {
     icon: <PauseIcon color="primary" />,
   },
 };
-
 const nextPlaybackState = {
   playing: "paused",
   paused: "playing",

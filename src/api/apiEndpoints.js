@@ -14,7 +14,7 @@ if (!process.env.REACT_APP_MEDIA_BASE_URL) {
   console.warn(`Environment variable REACT_APP_MEDIA_BASE_URL not defined, will default to ${mediaBaseUrl}`);
 }
 
-const segmentMeshesUrlPrefix = mediaBaseUrl + "/segment-meshes/";
+const segmentMeshesUrlPrefix = mediaBaseUrl + "/segment-meshes";
 
 const apiEndpoints = {
   reports: {
